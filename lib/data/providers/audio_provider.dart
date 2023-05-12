@@ -1,7 +1,8 @@
+import 'package:beatsleuth/data/models/track.dart';
 import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
 
-enum SourceMusic { popularArtist, search, library }
+enum SourceTrack { popularArtist, search, library }
 
 class AudioProvider with ChangeNotifier {
   final AudioPlayer audioPlayer = AudioPlayer();
@@ -11,11 +12,11 @@ class AudioProvider with ChangeNotifier {
   String? title;
   String? artist;
   String? artistUrl;
-  int? trackTimeMillis;
-  Music? music;
-  List<Music>? listMusic;
+  Duration? durationMs;
+  Track? track;
+  List<Track>? listTrack;
   bool loadingLibrary = false;
-  SourceMusic? sourceMusic;
+  SourceTrack? sourceTrack;
 
   Future pause() async {
     isPaused = true;
@@ -34,19 +35,20 @@ class AudioProvider with ChangeNotifier {
   }
 
   Future playSource(
-      Music music, List<Music> listMusic, SourceMusic source) async {
-    this.music = music;
-    cover = music.cover;
-    title = music.title;
-    artist = music.artist;
-    artistUrl = music.artistUrl;
-    trackTimeMillis = music.trackTimeMillis;
-    this.listMusic = listMusic;
+      Track track, List<Track> listTrack, SourceTrack source) async {
+    this.track = track;
+    cover = track.album.images.first.url;
+    title = track.name;
+    artist = track.artists.first.name;
+    artistUrl = track.artists.first.uri;
+    durationMs = track.durationMs;
+    this.listTrack = listTrack;
     isPaused = false;
     isPlayed = true;
-    sourceMusic = source;
+    sourceTrack = source;
 
-    await audioPlayer.setUrl(music.url);
+    await audioPlayer.setUrl(track.previewUrl);
+    
     audioPlayer.play();
 
     notifyListeners();
@@ -59,37 +61,37 @@ class AudioProvider with ChangeNotifier {
   Future addToLibrary() async {
     loadingLibrary = true;
     notifyListeners();
-    //await AudioService.save(music!);
+    //await AudioService.save(track!);
     loadingLibrary = false;
     notifyListeners();
   }
 
   Future next() async {
-    List<int?> listIndexMusic = listMusic!
+    List<int?> listIndexTrack = listTrack!
         .asMap()
         .entries
-        .map((m) => m.value.id == this.music!.id ? m.key : null)
+        .map((m) => m.value.id == this.track!.id ? m.key : null)
         .toList()
         .cast<int?>();
-    listIndexMusic.removeWhere((element) => element == null);
-    Music music = listMusic![
-        (listIndexMusic.first! + 1) > (listMusic!.length - 1)
-            ? (listIndexMusic.length - 1)
-            : (listIndexMusic.first! + 1)];
-    await playSource(music, listMusic!, sourceMusic!);
+    listIndexTrack.removeWhere((element) => element == null);
+    Track track = listTrack![
+        (listIndexTrack.first! + 1) > (listTrack!.length - 1)
+            ? (listIndexTrack.length - 1)
+            : (listIndexTrack.first! + 1)];
+    await playSource(track, listTrack!, sourceTrack!);
   }
 
   Future previous() async {
-    List<int?> listIndexMusic = listMusic!
+    List<int?> listIndexTrack = listTrack!
         .asMap()
         .entries
-        .map((m) => m.value.id == this.music!.id ? m.key : null)
+        .map((m) => m.value.id == this.track!.id ? m.key : null)
         .toList()
         .cast<int?>();
-    listIndexMusic.removeWhere((element) => element == null);
-    Music music = listMusic![
-        (listIndexMusic.first! - 1) < 0 ? 0 : (listIndexMusic.first! - 1)];
-    await playSource(music, listMusic!, sourceMusic!);
+    listIndexTrack.removeWhere((element) => element == null);
+    Track track = listTrack![
+        (listIndexTrack.first! - 1) < 0 ? 0 : (listIndexTrack.first! - 1)];
+    await playSource(track, listTrack!, sourceTrack!);
   }
 
   clean() async {
@@ -100,17 +102,17 @@ class AudioProvider with ChangeNotifier {
     title = null;
     artist = null;
     artistUrl = null;
-    trackTimeMillis = null;
-    music = null;
-    listMusic = null;
+    durationMs = null;
+    track = null;
+    listTrack = null;
     loadingLibrary = false;
 
     notifyListeners();
   }
 
-  removeMusic(Music music) async {
-    if (this.music!.id == music.id) await next();
-    listMusic = listMusic!.where((m) => m.id != music.id).toList();
+  removeTrack(Track track) async {
+    if (this.track!.id == track.id) await next();
+    listTrack = listTrack!.where((m) => m.id != track.id).toList();
 
     notifyListeners();
   }

@@ -5,13 +5,13 @@ import 'package:beatsleuth/data/models/artist.dart';
 class Track {
   final Album album;
   final List<Artist> artists;
-  final int durationMs;
+  final Duration durationMs;
   final Map<String, String> externalUrls;
   final String href;
   final String id;
-  final bool? isPlayable;
+  final bool isPlayable;
   final String name;
-  final String? previewUrl;
+  final String previewUrl;
   final int trackNumber;
   final String uri;
 
@@ -22,9 +22,9 @@ class Track {
     required this.externalUrls,
     required this.href,
     required this.id,
-    this.isPlayable,
+    required this.isPlayable,
     required this.name,
-    this.previewUrl,
+    required this.previewUrl,
     required this.trackNumber,
     required this.uri,
   });

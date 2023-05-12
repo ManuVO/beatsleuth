@@ -1,24 +1,24 @@
 import 'package:beatsleuth/data/models/customImage.dart';
 
 class Artist {
-  String? id;
-  String? name;
-  List<String>? genres;
-  List<CustomImage>? images;
-  int? popularity;
-  String? type;
-  String? uri;
-  bool? isFollowed;
+  final String id;
+  final String name;
+  final List<String> genres;
+  final List<CustomImage> images;
+  final int popularity;
+  final String type;
+  final String uri;
+  final bool isFollowed;
 
   Artist({
     required this.id,
     required this.name,
-    this.genres,
-    this.images,
-    this.popularity,
-    this.type,
-    this.uri,
-    this.isFollowed,
+    required this.genres,
+    required this.images,
+    required this.popularity,
+    required this.type,
+    required this.uri,
+    required this.isFollowed,
   });
 
   factory Artist.fromJson(Map<String, dynamic> json) {

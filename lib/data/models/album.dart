@@ -2,39 +2,39 @@ import 'package:beatsleuth/data/models/artist.dart';
 import 'package:beatsleuth/data/models/customImage.dart';
 
 class Album {
-  String? name;
-  String? id;
-  List<Artist>? artists;
-  List<CustomImage>? images;
-  String? releaseDate;
-  int? totalTracks;
-  String? label;
-  String? albumType;
-  Map<String, String>? externalUrls;
+  final String name;
+  final String id;
+  final List<Artist> artists;
+  final List<CustomImage> images;
+  final String releaseDate;
+  final int totalTracks;
+  final String label;
+  final String albumType;
+  final Map<String, String> externalUrls;
   
   Album({
     required this.name,
     required this.id,
-    this.artists,
-    this.images,
-    this.releaseDate,
-    this.totalTracks,
-    this.label,
-    this.albumType,
-    this.externalUrls,
+    required this.artists,
+    required this.images,
+    required this.releaseDate,
+    required this.totalTracks,
+    required this.label,
+    required this.albumType,
+    required this.externalUrls,
   });
 
   factory Album.fromJson(Map<String, dynamic> json) {
     return Album(
       name: json['name'],
       id: json['id'],
-      artists: json['artists'] != null ? List<Artist>.from(json['artists'].map((artist) => Artist.fromJson(artist))) : null,
-      images: json['images'] != null ? List<CustomImage>.from(json['images'].map((image) => CustomImage.fromJson(image))) : null,
+      artists: json['artists'] = List<Artist>.from(json['artists'].map((artist) => Artist.fromJson(artist))),
+      images: json['images'] = List<CustomImage>.from(json['images'].map((image) => CustomImage.fromJson(image))),
       releaseDate: json['release_date'],
       totalTracks: json['total_tracks'],
       label: json['label'],
       albumType: json['album_type'],
-      externalUrls: json['external_urls'] != null ? Map<String, String>.from(json['external_urls']) : null,
+      externalUrls: json['external_urls'] = Map<String, String>.from(json['external_urls']),
     );
   }
 
