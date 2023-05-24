@@ -1,13 +1,15 @@
-
+// search_page.dart
 import 'package:flutter/material.dart';
 
 class SearchPage extends StatelessWidget {
-  final Function(int) changePage;
 
-  const SearchPage(this.changePage, {Key? key}) : super(key:key);
+  
+  const SearchPage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold();
+    return Center(
+      child: Text('Buscar', style: Theme.of(context).textTheme.displayLarge),
+    );
   }
 }

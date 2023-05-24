@@ -2,12 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:beatsleuth/data/providers/audio_provider.dart';
 import 'package:provider/provider.dart';
 
-class PlayerWidget extends StatefulWidget {
-  @override
-  _PlayerWidgetState createState() => _PlayerWidgetState();
-}
+class PlayerWidget extends StatelessWidget {
+  
+  final AudioProvider audioProvider;
+  const PlayerWidget({required this.audioProvider});
 
-class _PlayerWidgetState extends State<PlayerWidget> {
   @override
   Widget build(BuildContext context) {
     final audioProvider = Provider.of<AudioProvider>(context);

@@ -42,8 +42,8 @@ class Album {
     return {
       'name': name,
       'id': id,
-      'artists': artists?.map((artist) => artist.toJson()).toList(),
-      'images': images?.map((image) => image.toJson()).toList(),
+      'artists': artists.map((artist) => artist.toJson()).toList(),
+      'images': images.map((image) => image.toJson()).toList(),
       'release_date': releaseDate,
       'total_tracks': totalTracks,
       'label': label,

@@ -43,7 +43,7 @@ class Artist {
       'id': id,
       'name': name,
       'genres': genres,
-      'images': images?.map((image) => image.toJson()).toList(),
+      'images': images.map((image) => image.toJson()).toList(),
       'popularity': popularity,
       'type': type,
       'uri': uri,

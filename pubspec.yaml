@@ -25,3 +25,15 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+
+  fonts:
+    - family: CircularStd
+      fonts:
+        - asset: build/flutter_assets/fonts/CircularStd/CircularStd-Black.ttf
+          weight: 900
+        - asset: build/flutter_assets/fonts/CircularStd/CircularStd-Bold.ttf
+          weight: 700
+        - asset: build/flutter_assets/fonts/CircularStd/CircularStd-Book.ttf
+          weight: 400
+        - asset: build/flutter_assets/fonts/CircularStd/CircularStd-Medium.ttf
+          weight: 500
