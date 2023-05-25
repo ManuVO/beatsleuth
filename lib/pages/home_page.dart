@@ -1,8 +1,59 @@
-// home_page.dart
 import 'package:flutter/material.dart';
+import 'package:beatsleuth/data/services/api_spotify_service.dart';
+import 'package:url_launcher/url_launcher.dart';
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
+
+  @override
+  _HomePageState createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  // Instancia del servicio de Spotify
+  final SpotifyService _spotifyService = SpotifyService();
+
+  // Listas para almacenar los datos de álbumes, artistas y canciones
+  List<Map<String, dynamic>> _albumes = [];
+  List<Map<String, dynamic>> _artistas = [];
+  List<Map<String, dynamic>> _canciones = [];
+
+  bool _dataLoaded = false;
+
+  @override
+  void initState() {
+    super.initState();
+    // Carga los datos de álbumes, artistas y canciones al iniciar la página
+    //_loadData();
+  }
+
+  // Método para cargar los datos de álbumes, artistas y canciones
+  Future<void> _loadData() async {
+    if (!_dataLoaded) {
+      try {
+        print('Cargando datos...');
+
+        // Obtiene los álbumes más populares
+        final popularAlbums = await _spotifyService.getPopularAlbums();
+
+        // Obtiene los artistas más populares
+        final popularArtists = await _spotifyService.getPopularArtists();
+
+        // Obtiene las canciones más populares
+        final popularSongs = await _spotifyService.getPopularSongs();
+
+        // Actualiza el estado para mostrar los datos en la página
+        setState(() {
+          _albumes = popularAlbums;
+          _artistas = popularArtists;
+          _canciones = popularSongs;
+        });
+      } catch (e) {
+        print('Error al cargar los datos: $e');
+      }
+      _dataLoaded = true;
+    }
+  }
 
   String _getSaludo() {
     final hora = DateTime.now().hour;
@@ -17,148 +68,141 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Lista de ejemplo de álbumes
-    final List<Map<String, dynamic>> albumes = [
-      {
-        'titulo': 'Álbum 1',
-        'artista': 'Artista 1',
-        'imagen': 'https://picsum.photos/100',
-      },
-      {
-        'titulo': 'Álbum 2',
-        'artista': 'Artista 2',
-        'imagen': 'https://picsum.photos/100',
-      },
-      // ...
-    ];
-
-    // Lista de ejemplo de artistas
-    final List<Map<String, dynamic>> artistas = [
-      {
-        'nombre': 'Artista 1',
-        'imagen': 'https://picsum.photos/100',
-      },
-      {
-        'nombre': 'Artista 2',
-        'imagen': 'https://picsum.photos/100',
-      },
-      // ...
-    ];
-
-    // Lista de ejemplo de canciones
-    final List<Map<String, dynamic>> canciones = [
-      {
-        'titulo': 'Canción 1',
-        'artista': 'Artista 1',
-        'duracion': '3:45',
-      },
-      {
-        'titulo': 'Canción 2',
-        'artista': 'Artista 2',
-        'duracion': '4:12',
-      },
-      // ...
-    ];
-
-    return SingleChildScrollView(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Text(
-              _getSaludo(),
-              style: Theme.of(context).textTheme.headline6,
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Text(
-              'Álbumes populares',
-              style: Theme.of(context).textTheme.headlineLarge,
-            ),
-          ),
-          SizedBox(
-            height: 200,
-            child: GridView.builder(
-              scrollDirection: Axis.horizontal,
-              gridDelegate:
-                  SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 1),
-              itemCount: albumes.length,
-              itemBuilder: (context, index) {
-                final album = albumes[index];
-                return Padding(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 8.0, vertical: 16.0),
-                  child: Column(
-                    children: [
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(8.0),
-                        child: Image.network(album['imagen']),
-                      ),
-                      SizedBox(height: 8.0),
-                      Text('${album['titulo']} · ${album['artista']}'),
-                    ],
+    return FutureBuilder(
+        future: _loadData(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            // Muestra un widget de carga mientras se espera la respuesta de la API
+            return Center(child: CircularProgressIndicator());
+          } else {
+            // Muestra el contenido de la página una vez que se han cargado los datos
+            return SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Text(
+                      _getSaludo(),
+                      style: Theme.of(context).textTheme.displayLarge,
+                    ),
                   ),
-                );
-              },
-            ),
-          ),
-          SizedBox(height: 8.0),
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Text(
-              'Artistas populares',
-              style: Theme.of(context).textTheme.headlineLarge,
-            ),
-          ),
-          SizedBox(
-            height: 200,
-            child: ListView.builder(
-              shrinkWrap: true,
-              scrollDirection: Axis.horizontal,
-              itemCount: artistas.length,
-              itemBuilder: (context, index) {
-                final artista = artistas[index];
-                return Padding(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 24.0, vertical: 16.0),
-                  child: Column(
-                    children: [
-                      ClipOval(
-                          child: Image.network(artista['imagen'],
-                              width: 100, height: 100)),
-                      SizedBox(height: 8.0),
-                      Text(artista['nombre']),
-                    ],
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Text(
+                      'Álbumes populares',
+                      style: Theme.of(context).textTheme.headlineLarge,
+                    ),
                   ),
-                );
-              },
-            ),
-          ),
-          SizedBox(height: 8.0),
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Text(
-              'Canciones populares',
-              style: Theme.of(context).textTheme.headlineLarge,
-            ),
-          ),
-          ListView.builder(
-            shrinkWrap: true,
-            physics: NeverScrollableScrollPhysics(),
-            itemCount: canciones.length,
-            itemBuilder: (context, index) {
-              final cancion = canciones[index];
-              return ListTile(
-                title: Text(cancion['titulo']),
-                subtitle:
-                    Text('${cancion['artista']} • ${cancion['duracion']}'),
-              );
-            },
-          ),
-        ],
-      ),
-    );
+                  SizedBox(
+                    height: 225,
+                    child: GridView.builder(
+                      scrollDirection: Axis.horizontal,
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 1),
+                      itemCount: _albumes.length,
+                      itemBuilder: (context, index) {
+                        final album = _albumes[index];
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 4.0, vertical: 16.0),
+                          child: Column(
+                            children: [
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(8.0),
+                                child: Image.network(
+                                  album['images'][0]['url'],
+                                  width: 150,
+                                  height: 150,
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+                              SizedBox(height: 8.0),
+                              Flexible(
+                                child: Text(
+                                  '${album['name']} · ${album['artists'][0]['name']}',
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                  textAlign: TextAlign.center,
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                  SizedBox(height: 8.0),
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Text(
+                      'Artistas populares',
+                      style: Theme.of(context).textTheme.headlineLarge,
+                    ),
+                  ),
+                  SizedBox(
+                    height: 225,
+                    child: ListView.builder(
+                        shrinkWrap: true,
+                        scrollDirection: Axis.horizontal,
+                        itemCount: _artistas.length,
+                        itemBuilder: (context, index) {
+                          final artista = _artistas[index];
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 12.0, vertical: 16.0),
+                            child: Column(
+                              children: [
+                                ClipOval(
+                                    child: Image.network(
+                                  artista['images'][0]['url'],
+                                  width: 150,
+                                  height: 150,
+                                  fit: BoxFit.cover,
+                                )),
+                                SizedBox(height: 8.0),
+                                Flexible(
+                                    child: Text(artista['name'],
+                                        maxLines: 2,
+                                        overflow: TextOverflow.ellipsis,
+                                        textAlign: TextAlign.center)),
+                              ],
+                            ),
+                          );
+                        }),
+                  ),
+                  SizedBox(height: 8.0),
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Text(
+                      'Canciones populares',
+                      style: Theme.of(context).textTheme.headlineLarge,
+                    ),
+                  ),
+                  ListView.builder(
+                      shrinkWrap: true,
+                      physics: NeverScrollableScrollPhysics(),
+                      itemCount: _canciones.length,
+                      itemBuilder: (context, index) {
+                        final cancion = _canciones[index];
+                        return ListTile(
+                          leading: Image.network(
+                              cancion['track']['album']['images'][0]['url'],
+                              width: 50,
+                              height: 50),
+                          title: Text(cancion['track']['name']),
+                          subtitle: Text(
+                              '${cancion['track']['artists'][0]['name']} • ${Duration(milliseconds: cancion['track']['duration_ms']).toString().split('.')[0].substring(2)}'),
+                          trailing: IconButton(
+                              icon: Icon(Icons.play_arrow),
+                              onPressed: () => launchUrl(cancion['track']
+                                  ['external_urls']['spotify'])),
+                        );
+                      })
+                ],
+              ),
+            );
+          }
+        });
   }
 }

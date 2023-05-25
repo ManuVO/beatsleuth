@@ -14,7 +14,7 @@ class _WrapperPageState extends State<WrapperPage> {
     HomePage(),
     SearchPage(),
   ];
-  final List<int> _navigationHistory = [];
+  final List<int> _navigationHistory = [0];
 
   void _onItemTap(int index) {
     setState(() {
@@ -24,9 +24,10 @@ class _WrapperPageState extends State<WrapperPage> {
   }
 
   Future<bool> _onWillPop() async {
-    if (_navigationHistory.isNotEmpty) {
+    if (_navigationHistory.length > 1) {
       setState(() {
-        _selectedIndex = _navigationHistory.removeLast();
+        _navigationHistory.removeLast();
+        _selectedIndex = _navigationHistory.last;
       });
       return false;
     } else {
