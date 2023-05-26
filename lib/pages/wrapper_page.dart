@@ -11,13 +11,22 @@ class WrapperPage extends StatefulWidget {
 class _WrapperPageState extends State<WrapperPage> {
   int _selectedIndex = 0;
   final List<Widget> _pages = [
-    HomePage(),
-    SearchPage(),
+    HomePage(data: HomePageData()),
+    SearchPage(data: SearchPageData()),
   ];
   final List<int> _navigationHistory = [0];
 
   void _onItemTap(int index) {
     setState(() {
+      if (index == _selectedIndex) {
+        if (index == 0) {
+          final oldPage = _pages[index] as HomePage;
+          _pages[index] = HomePage(key: UniqueKey(), data: oldPage.data);
+        } else if (index == 1) {
+          final oldPage = _pages[index] as SearchPage;
+          _pages[index] = SearchPage(key: UniqueKey(), data: oldPage.data);
+        }
+      }
       _selectedIndex = index;
       _navigationHistory.add(index);
     });
@@ -40,9 +49,15 @@ class _WrapperPageState extends State<WrapperPage> {
     return WillPopScope(
       onWillPop: _onWillPop,
       child: Scaffold(
-        body: IndexedStack(
-          index: _selectedIndex,
-          children: _pages,
+        body: AnimatedSwitcher(
+          duration: const Duration(milliseconds: 200),
+          transitionBuilder: (child, animation) {
+            return FadeTransition(
+              opacity: animation,
+              child: child,
+            );
+          },
+          child: _pages[_selectedIndex],
         ),
         bottomNavigationBar: BottomNavigationBar(
           items: const <BottomNavigationBarItem>[

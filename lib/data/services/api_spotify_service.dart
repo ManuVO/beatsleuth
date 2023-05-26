@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'dart:math';
 
 class SpotifyService {
   // Reemplaza estos valores con tus propias credenciales de Spotify
@@ -98,18 +97,42 @@ class SpotifyService {
   }
 
   Future<List<Map<String, dynamic>>> getTopPlaylists() async {
-  // Autentica en la API de Spotify si es necesario
-  if (_accessToken == null) await _authenticate();
+    // Autentica en la API de Spotify si es necesario
+    if (_accessToken == null) await _authenticate();
 
-  // Realiza una petición GET para obtener las playlists más populares de Estados Unidos
-  final response = await http.get(
-    Uri.parse('$baseUrl/browse/categories/toplists/playlists?country=US&limit=6'),
-    headers: {'Authorization': 'Bearer $_accessToken'},
-  );
+    // Realiza una petición GET para obtener las playlists más populares de Estados Unidos
+    final response = await http.get(
+      Uri.parse(
+          '$baseUrl/browse/categories/toplists/playlists?country=US&limit=10'),
+      headers: {'Authorization': 'Bearer $_accessToken'},
+    );
 
-  // Decodifica la respuesta y devuelve los datos de las playlists
-  final data = jsonDecode(response.body);
-  return List<Map<String, dynamic>>.from(data['playlists']['items']);
-}
+    // Decodifica la respuesta y devuelve los datos de las playlists
+    final data = jsonDecode(response.body);
+    return List<Map<String, dynamic>>.from(data['playlists']['items']);
+  }
 
+  Future<List<Map<String, dynamic>>> search(String query) async {
+    // Autentica en la API de Spotify si es necesario
+    if (_accessToken == null) await _authenticate();
+
+    // Realiza una petición GET para buscar canciones, álbumes y artistas
+    final response = await http.get(
+      Uri.parse('$baseUrl/search?q=$query&type=track,album,artist&limit=20'),
+      headers: {'Authorization': 'Bearer $_accessToken'},
+    );
+
+    // Decodifica la respuesta y extrae los datos de las canciones, álbumes y artistas
+    final data = jsonDecode(response.body);
+    final tracks = data['tracks']['items'];
+    final albums = data['albums']['items'];
+    final artists = data['artists']['items'];
+
+    // Combina los resultados en una sola lista y devuelve los datos
+    return [
+      ...List<Map<String, dynamic>>.from(tracks),
+      ...List<Map<String, dynamic>>.from(albums),
+      ...List<Map<String, dynamic>>.from(artists),
+    ];
+  }
 }

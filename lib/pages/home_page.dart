@@ -3,10 +3,18 @@ import 'package:beatsleuth/data/services/api_spotify_service.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({Key? key}) : super(key: key);
+  final HomePageData data;
+
+  const HomePage({Key? key, required this.data}) : super(key: key);
 
   @override
   _HomePageState createState() => _HomePageState();
+}
+
+class HomePageData {
+  List<Map<String, dynamic>> albumes = [];
+  List<Map<String, dynamic>> artistas = [];
+  List<Map<String, dynamic>> canciones = [];
 }
 
 class _HomePageState extends State<HomePage> {
@@ -24,6 +32,13 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     // Carga los datos de álbumes, artistas y canciones al iniciar la página
+    if(widget.data.albumes.isNotEmpty){
+      _albumes = widget.data.albumes;
+      _artistas = widget.data.artistas;
+      _canciones = widget.data.canciones;
+
+      _dataLoaded = true;
+    }
     //_loadData();
   }
 
@@ -34,25 +49,29 @@ class _HomePageState extends State<HomePage> {
         print('Cargando datos...');
 
         // Obtiene los álbumes más populares
-        final popularAlbums = await _spotifyService.getPopularAlbums();
+        final albums = await _spotifyService.getPopularAlbums();
 
         // Obtiene los artistas más populares
-        final popularArtists = await _spotifyService.getPopularArtists();
+        final artists = await _spotifyService.getPopularArtists();
 
         // Obtiene las canciones más populares
-        final popularSongs = await _spotifyService.getPopularSongs();
+        final songs = await _spotifyService.getPopularSongs();
 
         // Actualiza el estado para mostrar los datos en la página
         setState(() {
-          _albumes = popularAlbums;
-          _artistas = popularArtists;
-          _canciones = popularSongs;
+          widget.data.albumes = albums;
+          _albumes = albums;
+          widget.data.artistas = artists;
+          _artistas = artists;
+          widget.data.canciones = songs;
+          _canciones = songs;
         });
       } catch (e) {
         print('Error al cargar los datos: $e');
       }
       _dataLoaded = true;
-    }
+    } 
+    
   }
 
   String _getSaludo() {
