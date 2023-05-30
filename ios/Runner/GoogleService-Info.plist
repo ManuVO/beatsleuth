@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>API_KEY</key>
+	<string>AIzaSyAjwPVa39osHQJfJJNgI6tsSv6doIy9ZEk</string>
+	<key>GCM_SENDER_ID</key>
+	<string>329895412914</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.example.beatsleuth</string>
+	<key>PROJECT_ID</key>
+	<string>beatsleuth-171196</string>
+	<key>STORAGE_BUCKET</key>
+	<string>beatsleuth-171196.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:329895412914:ios:5e6ed75fe2e76ddd3d75ab</string>
+</dict>
+</plist>

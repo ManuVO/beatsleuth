@@ -1,11 +1,10 @@
 import 'package:beatsleuth/data/models/track.dart';
 import 'package:flutter/material.dart';
-import 'package:just_audio/just_audio.dart';
 
 enum SourceTrack { popularArtist, search, library }
 
 class AudioProvider with ChangeNotifier {
-  final AudioPlayer audioPlayer = AudioPlayer();
+  //final AudioPlayer audioPlayer = AudioPlayer();
   bool isPlayed = false;
   bool isPaused = false;
   String? cover;
@@ -21,7 +20,7 @@ class AudioProvider with ChangeNotifier {
   Future pause() async {
     isPaused = true;
     isPlayed = false;
-    await audioPlayer.pause();
+    //await audioPlayer.pause();
 
     notifyListeners();
   }
@@ -29,7 +28,7 @@ class AudioProvider with ChangeNotifier {
   Future play() async {
     isPlayed = true;
     isPaused = false;
-    audioPlayer.play();
+    //audioPlayer.play();
 
     notifyListeners();
   }
@@ -47,15 +46,15 @@ class AudioProvider with ChangeNotifier {
     isPlayed = true;
     sourceTrack = source;
 
-    await audioPlayer.setUrl(track.previewUrl);
+    //await audioPlayer.setUrl(track.previewUrl);
     
-    audioPlayer.play();
+    //audioPlayer.play();
 
     notifyListeners();
   }
 
   Future seek(Duration time) async {
-    await audioPlayer.seek(time);
+    //await audioPlayer.seek(time);
   }
 
   Future addToLibrary() async {
@@ -95,7 +94,7 @@ class AudioProvider with ChangeNotifier {
   }
 
   clean() async {
-    await audioPlayer.pause();
+    //await audioPlayer.pause();
     isPlayed = false;
     isPaused = false;
     cover = null;

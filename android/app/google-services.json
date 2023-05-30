@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "329895412914",
+    "project_id": "beatsleuth-171196",
+    "storage_bucket": "beatsleuth-171196.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:329895412914:android:7d257bbe3db67d403d75ab",
+        "android_client_info": {
+          "package_name": "com.example.beatsleuth"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyApJPGBthd8VWLgD36_BxlouC7bCft7H4E"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

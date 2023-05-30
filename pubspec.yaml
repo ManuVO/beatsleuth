@@ -14,18 +14,30 @@ dependencies:
   http: ^0.13.4
   logging: ^1.1.1
   equatable: ^2.0.0
-  just_audio: ^0.9.32
-  audio_session: ^0.1.6
   url_launcher: ^6.1.11
+  firebase_core: ^2.13.0
+  firebase_auth: ^4.6.1
+  google_sign_in: ^6.1.2
+  wave: ^0.2.2
+  page_transition: ^2.0.9
 
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^2.0.0
+  flutter_launcher_icons: ^0.13.1
+
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/images/logoSinFondov2.png"
 
 flutter:
   uses-material-design: true
+
+  assets:
+    - assets/images/
 
   fonts:
     - family: CircularStd
