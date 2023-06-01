@@ -2,7 +2,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'pages/wrapper_page.dart';
-import 'pages/authenticate_page.dart';
 import 'pages/default_page.dart';
 import 'utils/theme_util.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -29,7 +28,7 @@ class MyApp extends StatelessWidget {
         scaffoldBackgroundColor: const Color(0xFF121212),
         textTheme: circularStdTextTheme(),
       ),
-      home: SafeArea(child: DefaultPage()),
+      home: SafeArea(child: WrapperPage()),
     );
   }
 }

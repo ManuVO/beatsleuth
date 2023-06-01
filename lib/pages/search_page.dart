@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:beatsleuth/data/services/api_spotify_service.dart';
+import 'package:beatsleuth/data/services/spotify_service.dart';
 
 class SearchPage extends StatefulWidget {
   final SearchPageData data;

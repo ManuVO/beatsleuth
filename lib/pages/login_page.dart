@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:beatsleuth/pages/wrapper_page.dart';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -90,7 +91,7 @@ class _LoginPageState extends State<LoginPage> {
               ]),
               const SizedBox(height: 20),
               ElevatedButton(
-                onPressed: () {},
+                onPressed: () => _loginUser(),
                 style: ElevatedButton.styleFrom(
                     backgroundColor: const Color.fromARGB(255, 190, 131, 56),
                     padding: const EdgeInsets.symmetric(
@@ -112,5 +113,34 @@ class _LoginPageState extends State<LoginPage> {
         ),
       ),
     );
+  }
+
+  void _loginUser() async {
+    try {
+      /*
+    await _firebaseService.loginUser(
+      _emailController.text,
+      _passwordController.text,
+    );
+    */
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text('Has iniciado sesión correctamente'),
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(24),
+          ),
+          margin: const EdgeInsets.only(bottom: 50, left: 15, right: 15),
+        ),
+      );
+      Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(
+              builder: (context) => SafeArea(child: WrapperPage())),
+          (Route<dynamic> route) => false);
+    } catch (e) {
+      // Ocurrió un error al registrar al usuario
+      // Aquí puedes agregar código para manejar el error y mostrar un mensaje al usuario
+    }
   }
 }

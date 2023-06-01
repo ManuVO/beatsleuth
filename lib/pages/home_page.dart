@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:beatsleuth/data/services/api_spotify_service.dart';
+import 'package:beatsleuth/data/services/spotify_service.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class HomePage extends StatefulWidget {
@@ -92,13 +92,14 @@ class _HomePageState extends State<HomePage> {
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             // Muestra un widget de carga mientras se espera la respuesta de la API
-            return Center(child: CircularProgressIndicator());
+            return const Center(child: CircularProgressIndicator());
           } else {
             // Muestra el contenido de la página una vez que se han cargado los datos
             return SingleChildScrollView(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  const SizedBox(height: 10),
                   Padding(
                     padding: const EdgeInsets.all(16.0),
                     child: Text(
@@ -117,7 +118,7 @@ class _HomePageState extends State<HomePage> {
                     height: 225,
                     child: GridView.builder(
                       scrollDirection: Axis.horizontal,
-                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                           crossAxisCount: 1),
                       itemCount: _albumes.length,
                       itemBuilder: (context, index) {
@@ -136,7 +137,7 @@ class _HomePageState extends State<HomePage> {
                                   fit: BoxFit.cover,
                                 ),
                               ),
-                              SizedBox(height: 8.0),
+                              const SizedBox(height: 8.0),
                               Flexible(
                                 child: Text(
                                   '${album['name']} · ${album['artists'][0]['name']}',
@@ -151,7 +152,7 @@ class _HomePageState extends State<HomePage> {
                       },
                     ),
                   ),
-                  SizedBox(height: 8.0),
+                  const SizedBox(height: 8.0),
                   Padding(
                     padding: const EdgeInsets.all(16.0),
                     child: Text(
@@ -179,7 +180,7 @@ class _HomePageState extends State<HomePage> {
                                   height: 150,
                                   fit: BoxFit.cover,
                                 )),
-                                SizedBox(height: 8.0),
+                                const SizedBox(height: 8.0),
                                 Flexible(
                                     child: Text(artista['name'],
                                         maxLines: 2,
@@ -190,7 +191,7 @@ class _HomePageState extends State<HomePage> {
                           );
                         }),
                   ),
-                  SizedBox(height: 8.0),
+                  const SizedBox(height: 8.0),
                   Padding(
                     padding: const EdgeInsets.all(16.0),
                     child: Text(
@@ -200,7 +201,7 @@ class _HomePageState extends State<HomePage> {
                   ),
                   ListView.builder(
                       shrinkWrap: true,
-                      physics: NeverScrollableScrollPhysics(),
+                      physics: const NeverScrollableScrollPhysics(),
                       itemCount: _canciones.length,
                       itemBuilder: (context, index) {
                         final cancion = _canciones[index];
@@ -213,7 +214,7 @@ class _HomePageState extends State<HomePage> {
                           subtitle: Text(
                               '${cancion['track']['artists'][0]['name']} • ${Duration(milliseconds: cancion['track']['duration_ms']).toString().split('.')[0].substring(2)}'),
                           trailing: IconButton(
-                              icon: Icon(Icons.play_arrow),
+                              icon: const Icon(Icons.play_arrow),
                               onPressed: () => launchUrl(cancion['track']
                                   ['external_urls']['spotify'])),
                         );

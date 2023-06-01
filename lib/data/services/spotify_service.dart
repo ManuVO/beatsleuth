@@ -1,274 +1,138 @@
-import 'dart:async';
 import 'dart:convert';
+import 'package:http/http.dart' as http;
 
-import 'package:http/http.dart';
-import 'package:logging/logging.dart';
-
-class SpotifyApi {
-  final List<String> _scopes = [
-    'user-read-private',
-    'user-read-email',
-    'playlist-read-private',
-    'playlist-read-collaborative',
-  ];
-
-  /// You can signup for spotify developer account and get your own clientID and clientSecret incase you don't want to use these
-  final String clientID = '2efb385b388f49ce9af41d6c0dbf0022';
+class SpotifyService {
+  // Reemplaza estos valores con tus propias credenciales de Spotify
+  final String clientId = '2efb385b388f49ce9af41d6c0dbf0022';
   final String clientSecret = 'ee75efb22e724f42ae109b159a928d95';
-  final String redirectUrl = 'app://beatsleuth/auth';
-  final String spotifyApiUrl = 'https://accounts.spotify.com/api';
-  final String spotifyApiBaseUrl = 'https://api.spotify.com/v1';
-  final String spotifySearchItems = '/search';
-  final String spotifyRecommendation = '/recommendations';
-  final String spotifyUserPlaylistEndpoint = '/me/playlists';
-  final String spotifyPlaylistTrackEndpoint = '/playlists';
-  final String spotifyRegionalChartsEndpoint = '/views/charts-regional';
-  final String spotifyFeaturedPlaylistsEndpoint = '/browse/featured-playlists';
-  final String spotifyBaseUrl = 'https://accounts.spotify.com';
-  final String requestToken = 'https://accounts.spotify.com/api/token';
 
-  String requestAuthorization() =>
-      'https://accounts.spotify.com/authorize?client_id=$clientID&response_type=code&redirect_uri=$redirectUrl&scope=${_scopes.join('%20')}';
+  // URL base de la API de Spotify
+  final String baseUrl = 'https://api.spotify.com/v1';
 
-  // Future<String> authenticate() async {
-  //   final url = SpotifyApi().requestAuthorization();
-  //   final callbackUrlScheme = 'accounts.spotify.com';
+  // Token de acceso a la API de Spotify
+  String? _accessToken;
 
-  //   try {
-  //     final result = await FlutterWebAuth.authenticate(
-  //         url: url, callbackUrlScheme: callbackUrlScheme);
-  // print('got result....');
-  // print(result);
-  //     return result;
-  //   } catch (e) {
-  // print('Got error: $e');
-  //     return 'ERROR';
-  //   }
-  // }
+  // Método para autenticarse en la API de Spotify
+  Future<void> _authenticate() async {
+    // Codifica las credenciales en base64
+    final String credentials =
+        base64Url.encode(utf8.encode('$clientId:$clientSecret'));
 
-  Future<List> getSearchItems(String query) async {
-    try {
-      final Uri path =
-          Uri.parse('$spotifyApiBaseUrl$spotifySearchItems?q=$query&type=track,artist');
-
-      final response = await get(
-        path,
-        headers: {
-          'Accept': 'application/json'
-        },
-      );
-      if (response.statusCode == 200) {
-        final result = jsonDecode(response.body);
-        final List items = result['items'] as List;
-        return items;
-      }
-    } catch (e) {
-      Logger.root.severe('Error in getting spotify search response: $e');
-    }
-    return [];
-
-  }
-
-  Future<List> getGlobalRecommendation() async {
-    try {
-      final Uri path =
-          Uri.parse('$spotifyApiBaseUrl$spotifyRecommendation?seed_artists=6prmLEyn4LfHlD9NnXWlf7&limit=10');
-
-      final response = await get(
-        path,
-        headers: {
-          'Accept': 'application/json'
-        },
-      );
-      if (response.statusCode == 200) {
-        final result = jsonDecode(response.body);
-        final List traks = result['traks'] as List;
-        return traks;
-      }
-    } catch (e) {
-      Logger.root.severe('Error in getting spotify global recommendations: $e');
-    }
-    return [];
-
-  }
-
-  Future<List<String>> getAccessToken({
-    String? code,
-    String? refreshToken,
-  }) async {
-    final Map<String, String> headers = {
-      'Authorization':
-          "Basic ${base64.encode(utf8.encode("$clientID:$clientSecret"))}",
-    };
-
-    Map<String, String>? body;
-    if (code != null) {
-      body = {
-        'grant_type': 'authorization_code',
-        'code': code,
-        'redirect_uri': redirectUrl
-      };
-    } else if (refreshToken != null) {
-      body = {
-        'grant_type': 'refresh_token',
-        'refresh_token': refreshToken,
-      };
-    }
-
-    if (body == null) {
-      return [];
-    }
-
-    try {
-      final Uri path = Uri.parse(requestToken);
-      final response = await post(path, headers: headers, body: body);
-
-      if (response.statusCode == 200) {
-        final Map result = jsonDecode(response.body) as Map;
-        return <String>[
-          result['access_token'].toString(),
-          result['refresh_token'].toString(),
-          result['expires_in'].toString(),
-        ];
-      }
-    } catch (e) {
-      Logger.root.severe('Error in getting spotify access token: $e');
-    }
-    return [];
-  }
-
-  Future<List> getUserPlaylists(String accessToken) async {
-    try {
-      final Uri path =
-          Uri.parse('$spotifyApiBaseUrl$spotifyUserPlaylistEndpoint?limit=50');
-
-      final response = await get(
-        path,
-        headers: {
-          'Authorization': 'Bearer $accessToken',
-          'Accept': 'application/json'
-        },
-      );
-      if (response.statusCode == 200) {
-        final result = jsonDecode(response.body);
-        final List playlists = result['items'] as List;
-        return playlists;
-      }
-    } catch (e) {
-      Logger.root.severe('Error in getting spotify user playlists: $e');
-    }
-    return [];
-  }
-
-  Future<List> getAllTracksOfPlaylist(
-    String accessToken,
-    String playlistId,
-  ) async {
-    final List tracks = [];
-    int totalTracks = 100;
-
-    final Map data = await SpotifyApi().getHundredTracksOfPlaylist(
-      accessToken,
-      playlistId,
-      0,
-    );
-    totalTracks = data['total'] as int;
-    tracks.addAll(data['tracks'] as List);
-
-    if (totalTracks > 100) {
-      for (int i = 1; i * 100 <= totalTracks; i++) {
-        final Map data = await SpotifyApi().getHundredTracksOfPlaylist(
-          accessToken,
-          playlistId,
-          i * 100,
-        );
-        tracks.addAll(data['tracks'] as List);
-      }
-    }
-    return tracks;
-  }
-
-  Future<Map> getHundredTracksOfPlaylist(
-    String accessToken,
-    String playlistId,
-    int offset,
-  ) async {
-    try {
-      final Uri path = Uri.parse(
-        '$spotifyApiBaseUrl$spotifyPlaylistTrackEndpoint/$playlistId/tracks?limit=100&offset=$offset',
-      );
-      final response = await get(
-        path,
-        headers: {
-          'Authorization': 'Bearer $accessToken',
-          'Accept': 'application/json'
-        },
-      );
-
-      if (response.statusCode == 200) {
-        final result = await jsonDecode(response.body);
-        final List tracks = result['items'] as List;
-        final int total = result['total'] as int;
-        return {'tracks': tracks, 'total': total};
-      }
-    } catch (e) {
-      Logger.root.severe('Error in getting spotify playlist tracks: $e');
-    }
-    return {};
-  }
-
-  Future<Map> getTrackDetails(String accessToken, String trackId) async {
-    final Uri path = Uri.parse(
-      '$spotifyApiBaseUrl/tracks/$trackId',
-    );
-    final response = await get(
-      path,
+    // Realiza una petición POST para obtener el token de acceso
+    final response = await http.post(
+      Uri.parse('https://accounts.spotify.com/api/token'),
       headers: {
-        'Authorization': 'Bearer $accessToken',
-        'Accept': 'application/json'
+        'Authorization': 'Basic $credentials',
+        'Content-Type': 'application/x-www-form-urlencoded',
       },
+      body: {'grant_type': 'client_credentials'},
     );
 
-    if (response.statusCode == 200) {
-      final result = jsonDecode(response.body) as Map;
-      return result;
-    }
-    return {};
+    // Decodifica la respuesta y guarda el token de acceso
+    final data = jsonDecode(response.body);
+    _accessToken = data['access_token'];
   }
 
-  Future<List<Map>> getFeaturedPlaylists(String accessToken) async {
-    try {
-      final Uri path = Uri.parse(
-        '$spotifyApiBaseUrl/browse/featured-playlists',
-      );
-      final response = await get(
-        path,
-        headers: {
-          'Authorization': 'Bearer $accessToken',
-          'Accept': 'application/json'
-        },
-      );
-      final List<Map> songsData = [];
-      if (response.statusCode == 200) {
-        final result = jsonDecode(response.body);
-        await for (final element in result['playlists']['items']) {
-          songsData.add({
-            'name': element['name'],
-            'id': element['id'],
-            'image': element['images'][0]['url'],
-            'description': element['description'],
-            'externalUrl': element['external_urls']['spotify'],
-            'tracks': await SpotifyApi().getAllTracksOfPlaylist(
-              accessToken,
-              element['id'].toString(),
-            ),
-          });
-        }
-      }
-      return songsData;
-    } catch (e) {
-      Logger.root.severe('Error in getting spotify featured playlists: $e');
-      return List.empty();
-    }
+  Future<List<Map<String, dynamic>>> getPopularAlbums() async {
+    // Autentica en la API de Spotify si es necesario
+    if (_accessToken == null) await _authenticate();
+
+    // Obtiene la lista de reproducción más popular en Estados Unidos
+    final playlistResponse = await http.get(
+      Uri.parse(
+          '$baseUrl/browse/categories/toplists/playlists?country=US&limit=1'),
+      headers: {'Authorization': 'Bearer $_accessToken'},
+    );
+    final playlistData = jsonDecode(playlistResponse.body);
+    final playlistId = playlistData['playlists']['items'][0]['id'];
+
+    // Obtiene las canciones de la lista de reproducción
+    final tracksResponse = await http.get(
+      Uri.parse('$baseUrl/playlists/$playlistId/tracks?limit=6'),
+      headers: {'Authorization': 'Bearer $_accessToken'},
+    );
+    final tracksData = jsonDecode(tracksResponse.body);
+
+    // Extrae los datos de los álbumes de las canciones
+    final albums =
+        tracksData['items'].map((item) => item['track']['album']).toList();
+
+    // Devuelve los datos de los álbumes
+    return List<Map<String, dynamic>>.from(albums);
+  }
+
+  // Método para obtener los artistas más populares
+  Future<List<Map<String, dynamic>>> getPopularArtists() async {
+    // Autentica en la API de Spotify si es necesario
+    if (_accessToken == null) await _authenticate();
+
+    // Obtiene el año actual
+    final int currentYear = DateTime.now().year;
+
+    // Realiza una petición GET para buscar artistas populares del año actual
+    final response = await http.get(
+      Uri.parse('$baseUrl/search?q=year:$currentYear&type=artist&limit=6'),
+      headers: {'Authorization': 'Bearer $_accessToken'},
+    );
+
+    // Decodifica la respuesta y devuelve los datos de los artistas
+    final data = jsonDecode(response.body);
+    return List<Map<String, dynamic>>.from(data['artists']['items']);
+  }
+
+  // Método para obtener las canciones más populares
+  Future<List<Map<String, dynamic>>> getPopularSongs() async {
+    // Autentica en la API de Spotify si es necesario
+    if (_accessToken == null) await _authenticate();
+
+    // Realiza una petición GET para obtener las canciones más populares
+    final response = await http.get(
+      Uri.parse('$baseUrl/playlists/37i9dQZEVXbMDoHDwVN2tF/tracks?limit=6'),
+      headers: {'Authorization': 'Bearer $_accessToken'},
+    );
+
+    // Decodifica la respuesta y devuelve los datos de las canciones
+    final data = jsonDecode(response.body);
+    return List<Map<String, dynamic>>.from(data['items']);
+  }
+
+  Future<List<Map<String, dynamic>>> getTopPlaylists() async {
+    // Autentica en la API de Spotify si es necesario
+    if (_accessToken == null) await _authenticate();
+
+    // Realiza una petición GET para obtener las playlists más populares de Estados Unidos
+    final response = await http.get(
+      Uri.parse(
+          '$baseUrl/browse/categories/toplists/playlists?country=US&limit=10'),
+      headers: {'Authorization': 'Bearer $_accessToken'},
+    );
+
+    // Decodifica la respuesta y devuelve los datos de las playlists
+    final data = jsonDecode(response.body);
+    return List<Map<String, dynamic>>.from(data['playlists']['items']);
+  }
+
+  Future<List<Map<String, dynamic>>> search(String query) async {
+    // Autentica en la API de Spotify si es necesario
+    if (_accessToken == null) await _authenticate();
+
+    // Realiza una petición GET para buscar canciones, álbumes y artistas
+    final response = await http.get(
+      Uri.parse('$baseUrl/search?q=$query&type=track,album,artist&limit=20'),
+      headers: {'Authorization': 'Bearer $_accessToken'},
+    );
+
+    // Decodifica la respuesta y extrae los datos de las canciones, álbumes y artistas
+    final data = jsonDecode(response.body);
+    final tracks = data['tracks']['items'];
+    final albums = data['albums']['items'];
+    final artists = data['artists']['items'];
+
+    // Combina los resultados en una sola lista y devuelve los datos
+    return [
+      ...List<Map<String, dynamic>>.from(tracks),
+      ...List<Map<String, dynamic>>.from(albums),
+      ...List<Map<String, dynamic>>.from(artists),
+    ];
   }
 }
