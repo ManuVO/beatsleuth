@@ -72,7 +72,7 @@ class _WrapperPageState extends State<WrapperPage> {
           ],
           currentIndex: _selectedIndex,
           onTap: _onItemTap,
-          selectedItemColor: Theme.of(context).primaryColor,
+          selectedItemColor: Theme.of(context).focusColor,
           unselectedItemColor: Colors.grey,
           backgroundColor: navBarColor(),
           showUnselectedLabels: true,

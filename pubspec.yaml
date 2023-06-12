@@ -21,6 +21,9 @@ dependencies:
   wave: ^0.2.2
   page_transition: ^2.0.9
   cloud_firestore: ^4.8.0
+  percent_indicator: ^4.2.3
+  expandable_page_view: ^1.0.17
+  intl: ^0.18.1
 
 
 dev_dependencies:

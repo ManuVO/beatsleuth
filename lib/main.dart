@@ -9,9 +9,11 @@ import 'firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  /*
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+  */
   SystemChrome.setPreferredOrientations(
       [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]).then((_) {
     runApp(MyApp());
@@ -25,7 +27,8 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         brightness: Brightness.dark,
         primaryColor: const Color(0xFF1ED760),
-        scaffoldBackgroundColor: const Color(0xFF121212),
+        focusColor: Color.fromARGB(255, 255, 187, 75),
+        scaffoldBackgroundColor: const Color.fromARGB(255, 0, 20, 34),
         textTheme: circularStdTextTheme(),
       ),
       home: SafeArea(child: WrapperPage()),

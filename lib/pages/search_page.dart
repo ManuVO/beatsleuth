@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:beatsleuth/data/services/spotify_service.dart';
+import 'package:beatsleuth/pages/track_page.dart';
+
+import 'album_page.dart';
+import 'artist_page.dart';
 
 class SearchPage extends StatefulWidget {
   final SearchPageData data;
@@ -76,9 +80,9 @@ class _SearchPageState extends State<SearchPage> {
             ),
           ),
           Padding(
-            padding: EdgeInsets.all(8.0),
+            padding: const EdgeInsets.all(8.0),
             child: TextField(
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 prefixIcon: Icon(Icons.search),
                 hintText: '¿Qué tipo de canciones te gustaría encontrar?',
               ),
@@ -99,7 +103,7 @@ class _SearchPageState extends State<SearchPage> {
                         'Disfruta de las mejores playlist',
                         style: Theme.of(context).textTheme.displaySmall,
                       ),
-                      SizedBox(height: 4.0),
+                      const SizedBox(height: 4.0),
                       Expanded(
                         child: GridView.builder(
                           gridDelegate:
@@ -122,7 +126,7 @@ class _SearchPageState extends State<SearchPage> {
                                       fit: BoxFit.cover,
                                     ),
                                   ),
-                                  SizedBox(height: 8.0),
+                                  const SizedBox(height: 8.0),
                                   Flexible(
                                     child: Text(
                                       playlist['name'],
@@ -147,9 +151,9 @@ class _SearchPageState extends State<SearchPage> {
             visible: _showSearchResults,
             child: Expanded(
               child: Container(
-                margin: EdgeInsets.only(bottom: 4.0),
+                margin: const EdgeInsets.only(bottom: 4.0),
                 child: ListView.separated(
-                  separatorBuilder: (context, index) => Divider(),
+                  separatorBuilder: (context, index) => const Divider(),
                   itemCount: _searchResults.length,
                   itemBuilder: (context, index) {
                     final result = _searchResults[index];
@@ -175,12 +179,23 @@ class _SearchPageState extends State<SearchPage> {
                       title = result['name'];
                     }
                     if (imageUrl.isEmpty) {
-                      return SizedBox();
+                      return const SizedBox();
                     } else {
-                      return ListTile(
-                        leading: Image.network(imageUrl),
-                        title: Text(title),
-                        subtitle: subtitle.isNotEmpty ? Text(subtitle) : null,
+                      return InkWell(
+                        onTap: () {
+                          if (result['type'] == 'track') {
+                            _navigateToTrackPage(result);
+                          } else if (result['type'] == 'album') {
+                            _navigateToAlbumPage(result['id']);
+                          } else if (result['type'] == 'artist') {
+                            _navigateToArtistPage(result['id']);
+                          }
+                        },
+                        child: ListTile(
+                          leading: _imageType(result['type'], imageUrl),
+                          title: Text(title),
+                          subtitle: subtitle.isNotEmpty ? Text(subtitle) : null,
+                        ),
                       );
                     }
                   },
@@ -189,6 +204,55 @@ class _SearchPageState extends State<SearchPage> {
             ),
           )
         ],
+      ),
+    );
+  }
+
+  Widget _imageType(String type, String imageUrl) {
+  if (type == 'album') {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(12.0),
+      child: Image.network(imageUrl),
+    );
+  } else if (type == 'artist') {
+    return CircleAvatar(
+      backgroundImage: NetworkImage(imageUrl),
+    );
+  } else {
+    // Devuelve una imagen normal para otros tipos de objetos
+    return Image.network(imageUrl);
+  }
+}
+
+  void _navigateToTrackPage(Map<String, dynamic> track) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => SafeArea(
+          child: TrackPage({'track': track}),
+        ),
+      ),
+    );
+  }
+
+  void _navigateToAlbumPage(String albumId) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => SafeArea(
+          child: AlbumPage(albumId),
+        ),
+      ),
+    );
+  }
+
+  void _navigateToArtistPage(String artistId) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => SafeArea(
+          child: ArtistPage(artistId),
+        ),
       ),
     );
   }
