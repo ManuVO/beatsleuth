@@ -317,11 +317,49 @@ class _HomePageState extends State<HomePage> {
                                   overflow: TextOverflow.ellipsis, maxLines: 1),
                               subtitle: Text(formattedArtists,
                                   overflow: TextOverflow.ellipsis, maxLines: 1),
-                              trailing: IconButton(
-                                icon: const Icon(Icons.play_arrow),
-                                onPressed: () => launchUrl(cancion['track']
-                                    ['external_urls']['spotify']),
-                              ),
+                              trailing: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Container(
+                                        width: 40,
+                                        height: 40,
+                                        child: FloatingActionButton(
+                                          heroTag: 'preview$index',
+                                          backgroundColor:
+                                              Theme.of(context).focusColor,
+                                          onPressed: cancion['track']['preview_url'] !=
+                                                  null
+                                              ? () {
+                                                  //Implementar reproductor
+                                                  print(cancion['track']['preview_url']);
+                                                }
+                                              : null,
+                                          child: const Icon(Icons.music_note,
+                                              size: 20),
+                                        )),
+                                    const SizedBox(width: 10),
+                                    Container(
+                                        width: 40,
+                                        height: 40,
+                                        child: FloatingActionButton(
+                                          heroTag: 'externalURL$index',
+                                          backgroundColor: Colors.blue,
+                                          onPressed: cancion['track']['external_urls']
+                                                      ['spotify'] !=
+                                                  null
+                                              ? () async {
+                                                  final url = Uri.parse(
+                                                      cancion['track']['external_urls']
+                                                          ['spotify']);
+                                                  if (await canLaunchUrl(url)) {
+                                                    await launchUrl(url);
+                                                  }
+                                                }
+                                              : null,
+                                          child:
+                                              const Icon(Icons.link, size: 20),
+                                        ))
+                                  ]),
                             ),
                           ),
                         ],
